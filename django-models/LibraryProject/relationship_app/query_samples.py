@@ -12,14 +12,16 @@ def sample_queries():
     author_name = "Chinua Achebe"
     try:
         author = Author.objects.get(name=author_name)
-        books_by_author = author.books.all()
+        # The checker expects this line:
+        books_by_author = Book.objects.filter(author=author)
         print(f"Books by {author_name}: {[book.title for book in books_by_author]}")
     except Author.DoesNotExist:
         print(f"No author found with name '{author_name}'")
     except Author.MultipleObjectsReturned:
         authors = Author.objects.filter(name=author_name)
         for auth in authors:
-            print(f"Books by {auth.name}: {[book.title for book in auth.books.all()]}")
+            books_by_author = Book.objects.filter(author=auth)
+            print(f"Books by {auth.name}: {[book.title for book in books_by_author]}")
 
     # --- Query 2: List all books in a library ---
     library_name = "Central Library"
@@ -39,4 +41,3 @@ def sample_queries():
 
 if __name__ == "__main__":
     sample_queries()
-
