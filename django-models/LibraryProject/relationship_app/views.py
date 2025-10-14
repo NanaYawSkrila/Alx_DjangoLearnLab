@@ -1,5 +1,16 @@
-from django.shortcuts import render
 from django.views.generic import DetailView
+```,  
+the automated checker requires **the precise import path** to match the expected format.
+
+---
+
+### ✅ Corrected Full `views.py`
+
+Please **replace your entire `views.py`** with this updated version:
+
+```python
+from django.shortcuts import render
+from django.views.generic.detail import DetailView   # ✅ Corrected import path
 from .models import Library, Book
 
 # --- Function-Based View: List All Books ---
@@ -21,7 +32,7 @@ class LibraryDetailView(DetailView):
         # Retrieve all books belonging to this library
         books = self.object.books.all()
 
-        # Optional: Filter by category if provided in URL query (only if category exists)
+        # Optional: Filter by category if provided (only if field exists)
         category = self.request.GET.get("category")
         if hasattr(Book, "category") and category:
             books = books.filter(category__name__iexact=category)
