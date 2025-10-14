@@ -1,9 +1,9 @@
+cat > relationship_app/views.py <<'PY'
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.detail import DetailView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Library, Book
-
 
 # --- Function-Based View: List All Books ---
 def list_books(request):
@@ -21,7 +21,7 @@ class LibraryDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Retrieve all books related to this library (assuming related_name='books' in model)
+        # Retrieve all books related to this library (expects related_name='books' on M2M)
         books = self.object.books.all()
         context['books'] = books
         context['book_count'] = books.count()
@@ -63,3 +63,4 @@ def logout_view(request):
     """Logs out the current user."""
     logout(request)
     return render(request, 'relationship_app/logout.html')
+PY
