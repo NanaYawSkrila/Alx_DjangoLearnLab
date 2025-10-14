@@ -7,18 +7,21 @@ from .models import Library, Book
 
 # --- Function-Based View: List All Books ---
 def list_books(request):
+    """Displays a list of all books."""
     books = Book.objects.all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
 
 
 # --- Class-Based View: Library Details (Enhanced) ---
 class LibraryDetailView(DetailView):
+    """Displays details of a specific library and its associated books."""
     model = Library
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Retrieve all books related to this library (assuming related_name='books' in model)
         books = self.object.books.all()
         context['books'] = books
         context['book_count'] = books.count()
@@ -27,6 +30,7 @@ class LibraryDetailView(DetailView):
 
 # --- User Registration View ---
 def register_view(request):
+    """Handles new user registration."""
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -39,6 +43,7 @@ def register_view(request):
 
 # --- User Login View ---
 def login_view(request):
+    """Handles user authentication and login."""
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -55,5 +60,6 @@ def login_view(request):
 
 # --- User Logout View ---
 def logout_view(request):
+    """Logs out the current user."""
     logout(request)
     return render(request, 'relationship_app/logout.html')
