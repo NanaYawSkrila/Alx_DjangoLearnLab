@@ -23,6 +23,14 @@ class Book(models.Model):
         return self.title
 
 
+class Meta:
+        permissions = [
+            ("can_add_book", "Can add a new book"),
+            ("can_change_book", "Can edit book details"),
+            ("can_delete_book", "Can delete a book"),
+        ]
+
+
 class Library(models.Model):
     name = models.CharField(max_length=150)
     books = models.ManyToManyField(Book, related_name='libraries')
@@ -72,3 +80,4 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     """Ensure UserProfile is saved whenever the User object is saved."""
     instance.userprofile.save()
+
