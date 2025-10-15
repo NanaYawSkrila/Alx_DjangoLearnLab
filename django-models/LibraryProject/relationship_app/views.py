@@ -1,9 +1,14 @@
 cat > relationship_app/views.py <<'PY'
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse
 from django.views.generic.detail import DetailView
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Library, Book
+
+
 
 # --- Function-Based View: List All Books ---
 def list_books(request):
@@ -64,3 +69,4 @@ def logout_view(request):
     logout(request)
     return render(request, 'relationship_app/logout.html')
 PY
+
