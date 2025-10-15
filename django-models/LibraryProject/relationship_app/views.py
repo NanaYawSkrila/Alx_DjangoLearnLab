@@ -6,13 +6,57 @@ from django.views.generic.detail import DetailView
 from django.contrib.auth.models import User
 from django.db import models
 from .models import Library, Book, UserProfile
+from django.contrib.auth.decorators import permission_required
+from .models import Library, Book
 
-# --- Function-Based View: List All Books ---
+
+
+# --- List all books ---
 def list_books(request):
     books = Book.objects.all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
 
-# --- Class-Based View: Library Details ---
+
+# --- Book Management with Permissions ---
+@permission_required('relationship_app.can_add_book', raise_exception=True)
+def add_book(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        author_name = request.POST.get('author')
+        if title and author_name:
+            from .models import Author
+            author, created = Author.objects.get_or_create(name=author_name)
+            Book.objects.create(title=title, author=author)
+            return redirect('list_books')
+    return render(request, 'relationship_app/add_book.html')
+
+
+@permission_required('relationship_app.can_change_book', raise_exception=True)
+def edit_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        author_name = request.POST.get('author')
+        if title and author_name:
+            from .models import Author
+            author, created = Author.objects.get_or_create(name=author_name)
+            book.title = title
+            book.author = author
+            book.save()
+            return redirect('list_books')
+    return render(request, 'relationship_app/edit_book.html', {'book': book})
+
+
+@permission_required('relationship_app.can_delete_book', raise_exception=True)
+def delete_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == 'POST':
+        book.delete()
+        return redirect('list_books')
+    return render(request, 'relationship_app/delete_book.html', {'book': book})
+
+
+# --- Library Detail View ---
 class LibraryDetailView(DetailView):
     model = Library
     template_name = 'relationship_app/library_detail.html'
@@ -26,15 +70,12 @@ class LibraryDetailView(DetailView):
         return context
 
 
-# ==============================
-# 🔐 AUTHENTICATION VIEWS
-# ==============================
-
+# --- Authentication Views ---
 def register_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            form.save()
             return redirect('login')
     else:
         form = UserCreationForm()
@@ -59,6 +100,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return render(request, 'relationship_app/logout.html')
+
 
 
 # ==============================
@@ -88,3 +130,4 @@ def librarian_view(request):
 @user_passes_test(is_member)
 def member_view(request):
     return render(request, 'relationship_app/member_view.html')
+
