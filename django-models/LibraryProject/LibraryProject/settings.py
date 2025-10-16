@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'relationship_app',
 ]
 
+AUTH_USER_MODEL = 'relationship_app.CustomUser'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
